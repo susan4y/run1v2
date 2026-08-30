@@ -25,7 +25,7 @@ def main():
         sys.exit(1)
     
     # 2. Move into the directory
-    repo_dir = "1v2"  # Changed from "1" to "1v2"
+    repo_dir = "1v2"
     print(f"Changing directory to: {repo_dir}")
     
     # Check if directory exists
@@ -34,32 +34,10 @@ def main():
         sys.exit(1)
     
     # 3. Make the file executable
-    # Note: The file might be named differently in the new repo
-    # Assuming it's still named "1", but could be different
+    # Note: The command should be "chmod +x 1" (assuming the file is named "1")
+    # This is correct if there's a file named "1" in the directory
     print("Making file '1' executable...")
     if not run_command("chmod +x 1", cwd=repo_dir):
-        # If file "1" doesn't exist, check for other executable files
-        print("⚠️ File '1' not found, checking for other executable files...")
-        try:
-            # List files in the directory
-            files = os.listdir(repo_dir)
-            print(f"Files in {repo_dir}: {files}")
-            # Look for any executable file
-            for file in files:
-                file_path = os.path.join(repo_dir, file)
-                if os.path.isfile(file_path) and os.access(file_path, os.X_OK):
-                    print(f"Found executable: {file}")
-                    print(f"Making {file} executable...")
-                    if not run_command(f"chmod +x {file}", cwd=repo_dir):
-                        sys.exit(1)
-                    print(f"Running ./{file}...")
-                    print("-" * 50)
-                    if not run_command(f"./{file}", cwd=repo_dir):
-                        sys.exit(1)
-                    print("-" * 50)
-                    return
-        except Exception as e:
-            print(f"Error checking files: {e}")
         sys.exit(1)
     
     # 4. Run the executable
